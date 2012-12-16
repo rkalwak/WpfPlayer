@@ -1,0 +1,66 @@
+﻿<Window x:Class="Wpf_Player.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        
+        Title="MainWindow" Name="mywindow" Height="394" Width="615" Loaded="Window_Loaded" >
+    
+    <Grid Width="574">
+        <Grid.RowDefinitions>
+            
+            <RowDefinition Name="Played_song"  Height="Auto" />
+            <RowDefinition Name="Control_buttons" Height="70"/>
+            <RowDefinition Name="Progress_slider" Height="35"/>
+            <RowDefinition Name="Spectrum_image" Height="65" />
+            <RowDefinition Name="Listview" Height="139*" />
+            <RowDefinition Height="38" />
+          
+          
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="411" />
+            <ColumnDefinition Width="50*" />
+        </Grid.ColumnDefinitions>
+        <Label Grid.Row="0" Grid.Column="0" Content="Name:"/>
+
+        <TextBox Name="tb_playedFile" Grid.Column="1" Margin="3,3,1,3" Grid.ColumnSpan="2"  
+                 Text="{Binding ElementName=mywindow, Path=CurrentPosition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        
+        <Button Grid.Column="1" Grid.Row="4" HorizontalAlignment="Right" 
+            MinWidth="80" Margin="0,185,0,0" Content="Stop" Width="124" Click="Button_Click" Grid.ColumnSpan="2" />
+        <ListView Name="listview1" Margin="0,19,1,0" ItemsSource="{Binding}" MouseDoubleClick="listview1_MouseDoubleClick" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="4" SelectionChanged="listview1_SelectionChanged">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Artist" DisplayMemberBinding="{Binding Path=Artist}" ></GridViewColumn>
+                    <GridViewColumn Header="Title"  DisplayMemberBinding="{Binding Path=Title}" ></GridViewColumn>
+                    <GridViewColumn Header="Album" DisplayMemberBinding="{Binding Path=Album}" ></GridViewColumn>
+                    <GridViewColumn Header="Genre" DisplayMemberBinding="{Binding Path=Genre}"></GridViewColumn>
+                    <GridViewColumn Header="Year" DisplayMemberBinding="{Binding Path=Year}" ></GridViewColumn>
+                    <GridViewColumn Header="Duration" DisplayMemberBinding="{Binding Path=Duration}" ></GridViewColumn>
+                    <GridViewColumn Header="FileName" Width="0" DisplayMemberBinding="{Binding Path=FileName}" ></GridViewColumn>
+
+                </GridView>
+            </ListView.View>
+
+        </ListView>
+        <Slider Name="slProgress" Grid.Row="2" Height="23" HorizontalAlignment="Left" Margin="0,4,0,0"  VerticalAlignment="Top" Width="411" Grid.Column="1" Maximum="200" 
+                Value="{Binding ElementName=mywindow, Path=CurrentPos, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PreviewMouseUp="slProgress_PreviewMouseUp" />
+        <Image Name="spectrumImage" Grid.Column="1" Grid.Row="3" Height="65" HorizontalAlignment="Left" Stretch="Fill" VerticalAlignment="Top" Width="461" Grid.ColumnSpan="2" MouseDown="spectrumImage_MouseDown" />
+        <Slider Grid.Row="3" Height="204" HorizontalAlignment="Center" Name="slVolume" VerticalAlignment="Center" Width="36" Orientation="Vertical" ValueChanged="slVolume_ValueChanged" Margin="3,-1,3,0" Grid.RowSpan="2" />
+        <Button Content="Prev" Grid.Column="1" Grid.Row="1" Height="23" HorizontalAlignment="Left" Margin="15,6,0,0" Name="btn_prev" VerticalAlignment="Top" Width="60" Click="btn_prev_Click" />
+        <Button Content="Next" Grid.Column="1" Grid.Row="1" Height="23" HorizontalAlignment="Right" Margin="0,7,259,0" Name="btn_next" VerticalAlignment="Top" Width="60" Click="btn_next_Click" />
+        <Button Content="Pause" Grid.Column="1" Grid.Row="1" Height="23" HorizontalAlignment="Left" Margin="174,5,0,0" Name="btn_pause" VerticalAlignment="Top" Width="60" Click="btn_pause_Click" />
+        <Button Content="Play" Grid.Column="1" Grid.Row="1" Height="23" HorizontalAlignment="Left" Margin="251,6,0,0" Name="btn_play" VerticalAlignment="Top" Width="60" Click="btn_play_Click" />
+        <Button Content="Stop" Grid.Column="1" Grid.Row="1" Height="23" HorizontalAlignment="Left" Margin="332,8,0,0" Name="btn_stop" VerticalAlignment="Top" Width="60" Click="btn_stop_Click" />
+        
+        <GroupBox Grid.Column="1" Grid.Row="1" Header="groupBox1" Height="36" HorizontalAlignment="Left" Margin="3,34,0,0" Name="groupBox1" VerticalAlignment="Top" Width="288">
+            <Grid Height="26" Width="285">
+                <CheckBox Content="CheckBox" Height="16" HorizontalAlignment="Left"  Name="checkBox3" VerticalAlignment="Top" Margin="12,0,0,0" />
+                <CheckBox Content="CheckBox" Height="16" HorizontalAlignment="Left"  Name="checkBox1" VerticalAlignment="Top" Margin="113,0,0,0" />
+                <CheckBox Content="CheckBox" Height="16" HorizontalAlignment="Left"  Name="checkBox2" VerticalAlignment="Top" Margin="205,0,0,0" />
+            </Grid>
+        </GroupBox>
+        <Image Grid.Column="2" Grid.RowSpan="2" Height="71" HorizontalAlignment="Left" Margin="0,24,0,0" Name="coverImage" Stretch="Fill" VerticalAlignment="Top" Width="70"
+            Source="{Binding  ElementName=mywindow, Path=CoverImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"   />
+    </Grid>
+</Window>
