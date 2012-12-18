@@ -73,7 +73,14 @@ namespace Wpf_Player
         public void insertDataIntoDB(string query)
         {
             SqlCommand cmd = new SqlCommand(query, sqlConnection);
-            cmd.ExecuteNonQuery();
+            try
+            {
+
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+            }
         }
 
     }

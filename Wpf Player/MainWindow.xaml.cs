@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows;
+
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
@@ -18,6 +19,8 @@ using System.Timers;
 using System.ComponentModel;
 using Un4seen.Bass.Misc;
 using System.Runtime.InteropServices;
+using System.IO;
+using System.Windows.Forms;
 
 namespace Wpf_Player
 {
@@ -26,8 +29,8 @@ namespace Wpf_Player
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        private int playState, songLenght, selectedSong, songNumber;
-        private bool looping, shuffling;
+        private int playState, songLenght, selectedSong,songNumber;
+        private bool looping, shuffling, dbClient;
         DatabaseManager db;
         DataTable dt;
         private System.Drawing.Bitmap spectrum;
@@ -36,8 +39,8 @@ namespace Wpf_Player
         private DataRowView drv;
         private BitmapSource im;
         private Player player = new Player();
-        private Timer progressTimer = new Timer();
-        private Timer spectrumTimer = new Timer();
+        private System.Timers.Timer progressTimer = new System.Timers.Timer();
+        private System.Timers.Timer spectrumTimer = new System.Timers.Timer();
         private int currentPos = 0,sliderProgressMax=0;
         private string currentPosition = String.Empty;
         private BitmapImage coverIm=new BitmapImage();
@@ -120,8 +123,10 @@ namespace Wpf_Player
             spectrumTimer.Interval = 300;
             slVolume.Maximum = 100;
             slVolume.Minimum = 0;
-            shuffling = true;
+            shuffling = false;
+            looping = false;
             slVolume.Value = 100;
+            dbClient = true;
         }
 
        
@@ -490,6 +495,136 @@ namespace Wpf_Player
         {
             song_change("prev");
         }
+
+        private void checkBox3_Checked(object sender, RoutedEventArgs e)
+        {
+            SetVolume(0);
+        }
+
+        private void checkBox3_Unchecked(object sender, RoutedEventArgs e)
+        {
+            SetVolume((int)slVolume.Value);
+        }
+
+        private void checkBox2_Checked(object sender, RoutedEventArgs e)
+        {
+            if (!shuffling)
+            {
+                shuffling = true;
+            }
+        }
+
+        private void checkBox2_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (shuffling)
+            {
+                shuffling = false;
+            }
+        }
+
+        private void checkBox1_Checked(object sender, RoutedEventArgs e)
+        {
+            if (!looping)
+            {
+                looping = true;
+            }
+        }
+
+        private void checkBox1_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (looping)
+            {
+                looping = false;
+            }
+        }
+
+        private void btn_open_Click(object sender, RoutedEventArgs e)
+        {
+            
+            OpenFileDialog fd = new OpenFileDialog();
+            fd.Filter = "mp3 files|*.mp3";
+            fd.ShowDialog();
+            
+                Song song = new Song(fd.FileName);
+                songLenght = song.Duration;
+                song.Number = songNumber;
+                
+                string request = String.Format("insert into music (Artist,Title,FileName,Duration) values ('{0}','{1}','{2}',{3});", song.Artist, song.Title, song.FileName, song.Duration);
+                
+                db.insertDataIntoDB(request);
+                request = "select * from music;";
+                db = new DatabaseManager("SQLSERVER", "musicclient");
+
+                
+                
+                dt = new DataTable();
+                dt = db.getQueryFromDB("select * from music");
+                listview1.DataContext = dt.DefaultView;
+
+
+            
+        }
+
+        private void btn_openf_Click(object sender, RoutedEventArgs e)
+        {
+           
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
+            fbd.ShowDialog();
+            
+                System.Collections.Specialized.StringCollection fileCol = new System.Collections.Specialized.StringCollection();
+                System.IO.DirectoryInfo dir = new System.IO.DirectoryInfo(fbd.SelectedPath);
+
+                fileCol.Add(fbd.SelectedPath);
+                FileInfo[] files = dir.GetFiles("*.mp3");
+                Song song;
+                string request="";
+                foreach (FileInfo fi in files)
+                {
+                    if (fi.Extension == ".mp3")
+                    {
+                        song = new Song(fi.FullName);
+                        song.Number = songNumber;
+                        ;
+                        if (song.Artist == null || song.Title == null)
+                        {
+                        }
+                        else
+                        {
+                            request = "insert into music (Artist,Title,FileName,Duration) values ('" + song.Artist.Replace("'", "''") + "','" + song.Title.Replace("'", "''") + "','" + song.FileName.Replace("'", "''") + "'," + song.Duration + ")";
+                         
+                            db.insertDataIntoDB(request);
+                        }
+
+                    }
+
+                }
+                request = "select * from music;";
+                listview1.DataContext = db.getQueryFromDB(request);
+
+
+
+            
+        }
+
+        private void btn_db_Click(object sender, RoutedEventArgs e)
+        {
+            if (dbClient)
+            {
+                db = new DatabaseManager("SQLSERVER", "musicclient");
+                listview1.DataContext= db.getQueryFromDB("select * from music");
+                dbClient = false;
+            }
+            else
+            {
+                db = new DatabaseManager("SQLSERVER", "musicserver");
+                listview1.DataContext = db.getQueryFromDB("select * from music");
+                dbClient = true;
+            }
+        }
+
+        
+
+       
      
 
 
