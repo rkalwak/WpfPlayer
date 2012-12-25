@@ -16,10 +16,11 @@ namespace Wpf_Player
         private SqlConnection sqlConnection;
         private DataSet dataSet;
         public DatabaseManager() { }
-        public DatabaseManager(string server,string database)
+        public DatabaseManager(string server,string database,string login,string pass)
         {
             //@"Server=SQLSERVER;Database=musicclient;Integrated Security=SSPI"
-            connectionString = String.Format(@"Server={0};Database={1};Integrated Security=SSPI",server,database);
+            //powinna byc nazwa tylko 
+            connectionString = String.Format(@"Network Address={0};Database={1};user ID={2};Pwd={3};", server, database,login,pass);
             sqlConnection = new SqlConnection(connectionString);
             dataSet = new DataSet("music");
             openConnection();

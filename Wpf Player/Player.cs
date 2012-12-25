@@ -119,16 +119,22 @@ namespace Wpf_Player
             fxChanged = true;
             
         }
-        public void SetEchoAndChorus(float value)
+        public void SetEcho(float value)
         {
             _echo.fWetDryMix = value;
             Bass.BASS_FXSetParameters(_fxEchoHandle, _echo);
             fxChanged = true;
         }
+        public void SetChorus(float value)
+        {
+            _chorus.fWetDryMix = value;
+            Bass.BASS_FXSetParameters(_fxChorusHandle, _chorus);
+            fxChanged = true;
+        }
         public void PlaySong()
         {
 
-  
+            
             
             
             Bass.BASS_ChannelPlay(stream, false);
