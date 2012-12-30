@@ -732,60 +732,64 @@ namespace Wpf_Player
         {
             OpenFileDialog fd = new OpenFileDialog();
             fd.Filter = "mp3 files|*.mp3";
-            fd.ShowDialog();
 
-            Song song = new Song(fd.FileName);
-            songLenght = song.Duration;
-            song.Number = songNumber;
+            if ("OK" == fd.ShowDialog().ToString())
+            {
+                Song song = new Song(fd.FileName);
+                songLenght = song.Duration;
+                song.Number = songNumber;
 
-            string request = String.Format("insert into music (Artist,Title,FileName,Duration) values ('{0}','{1}','{2}',{3});", song.Artist, song.Title, song.FileName, song.Duration);
+                string request = String.Format("insert into music (Artist,Title,Genre,Year,FileName,Duration) values ('{0}','{1}','{2}',{3},'{4}',{5});", song.Artist, song.Title,song.Genre,song.Year, song.FileName, song.Duration);
 
-            db.insertDataIntoDB(request);
-            request = "select * from music;";
-            db = new DatabaseManager("192.168.1.20", "musicclient",login,pass);
+                db.insertDataIntoDB(request);
+                request = "select * from music;";
+                db = new DatabaseManager("192.168.1.20", "musicclient", login, pass);
 
 
 
-            dt = new DataTable();
-            dt = db.getQueryFromDB("select * from music");
-            listview1.DataContext = dt.DefaultView;
+                dt = new DataTable();
+                dt = db.getQueryFromDB("select * from music");
+                listview1.DataContext = dt.DefaultView;
+            }
         }
 
         private void opendirectory_Click(object sender, RoutedEventArgs e)
         {
             FolderBrowserDialog fbd = new FolderBrowserDialog();
-            fbd.ShowDialog();
 
-            System.Collections.Specialized.StringCollection fileCol = new System.Collections.Specialized.StringCollection();
-            System.IO.DirectoryInfo dir = new System.IO.DirectoryInfo(fbd.SelectedPath);
-
-            fileCol.Add(fbd.SelectedPath);
-            FileInfo[] files = dir.GetFiles("*.mp3");
-            Song song;
-            string request = "";
-            db = new DatabaseManager("192.168.1.20", "musicclient", login, pass);
-            foreach (FileInfo fi in files)
+            if ("OK" == fbd.ShowDialog().ToString())
             {
-                if (fi.Extension == ".mp3")
+                System.Collections.Specialized.StringCollection fileCol = new System.Collections.Specialized.StringCollection();
+                System.IO.DirectoryInfo dir = new System.IO.DirectoryInfo(fbd.SelectedPath);
+
+                fileCol.Add(fbd.SelectedPath);
+                FileInfo[] files = dir.GetFiles("*.mp3");
+                Song song;
+                string request = "";
+                db = new DatabaseManager("192.168.1.20", "musicclient", login, pass);
+                foreach (FileInfo fi in files)
                 {
-                    song = new Song(fi.FullName);
-                    song.Number = songNumber;
-
-                    if (song.Artist == null || song.Title == null)
+                    if (fi.Extension == ".mp3")
                     {
-                    }
-                    else
-                    {
-                        request = "insert into music (Artist,Title,FileName,Duration) values ('" + song.Artist.Replace("'", "''") + "','" + song.Title.Replace("'", "''") + "','" + song.FileName.Replace("'", "''") + "'," + song.Duration + ")";
+                        song = new Song(fi.FullName);
+                        song.Number = songNumber;
 
-                        db.insertDataIntoDB(request);
+                        if (song.Artist == null || song.Title == null)
+                        {
+                        }
+                        else
+                        {
+                           // request = "insert into music (Artist,Title,FileName,Duration) values ('" + song.Artist.Replace("'", "''") + "','" + song.Title.Replace("'", "''") + "','" + song.FileName.Replace("'", "''") + "'," + song.Duration + ")";
+                            request = String.Format("insert into music (Artist,Title,Genre,Year,FileName,Duration) values ('{0}','{1}','{2}',{3},'{4}',{5});", song.Artist.Replace("'", "''"), song.Title.Replace("'", "''"), song.Genre.Replace("'", "''"), song.Year, song.FileName.Replace("'", "''"), song.Duration);
+                            db.insertDataIntoDB(request);
+                        }
+
                     }
 
                 }
-
+                request = "select * from music;";
+                listview1.DataContext = db.getQueryFromDB(request);
             }
-            request = "select * from music;";
-            listview1.DataContext = db.getQueryFromDB(request);
         }
         
 
